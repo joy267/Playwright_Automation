@@ -88,4 +88,59 @@ test.describe('Page Builder',() => {
         expect(first_page_name).toBe(validate_first_page_name) 
         
     })
+
+    test("Create a new page", async({page}) => {
+
+        await page.locator('[data-testid="WebAssetIcon"]').click()
+        await page.locator(':text-is("Page Building")').click()
+        await page.locator('#combo-box-demo').click()
+        await page.keyboard.press('ArrowDown')
+        await page.keyboard.press ('Enter')
+        await page.locator(':text-is("SELECT SITE")').click()
+        await page.waitForLoadState("networkidle")
+
+        await page.locator(':text-is("Create New Page")').click()
+        await page.waitForLoadState('networkidle')
+
+        const new_page_name = `test_${Date.now()}`
+
+        await page.locator('#pageTitle').fill(new_page_name)
+        await page.locator('#pageGroups').click()
+        await page.keyboard.press('ArrowDown')
+        await page.keyboard.press('ArrowDown')
+        await page.keyboard.press('Enter')
+
+        await page.locator(':text-is("Create")').click()
+
+        await page.waitForLoadState('load')
+        await page.waitForLoadState('networkidle')
+
+        expect(new_page_name).toBe(new_page_name)
+
+        const add_content_button = page.locator(':text-is("ADD CONTENT")')
+        await expect(add_content_button).toBeVisible({timeout:15000})
+        await add_content_button.click()
+
+        const floating_menu = page.locator('[class="MuiBox-root css-29py95"]')
+        await expect(floating_menu).toBeVisible()
+
+        await page.locator('[aria-label="Add Text Block"]').click()
+
+        const content_box = page.locator('[class="MuiBox-root css-0"]')
+        await expect(content_box).toBeVisible()
+
+        const clear_all_text = page.locator(':text-is("Edit this text")')
+        await clear_all_text.press('Control+A')
+        await clear_all_text.press('Delete')
+
+        const editor_box = page.locator('[class="MuiBox-root css-1o1jyss"]')
+        await editor_box.click()
+        const header_1 = "test_big_header"
+        await editor_box.fill(header_1)
+        await editor_box.press('Control+A')
+        await page.locator('text-is("Normal Text")').click()
+        await page.locator('text-is("Big Header")').click()
+
+        await page.locator('text-is("Save")').click()
+    })
 })
