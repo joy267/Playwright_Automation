@@ -126,21 +126,24 @@ test.describe('Page Builder',() => {
 
         await page.locator('[aria-label="Add Text Block"]').click()
 
-        const content_box = page.locator('[class="MuiBox-root css-0"]')
+        const content_box = page.locator('[class="MuiBox-root css-0"]').nth(2)
         await expect(content_box).toBeVisible()
 
-        const clear_all_text = page.locator(':text-is("Edit this text")')
+        const clear_all_text = page.locator('[class="MuiBox-root css-1wgkivy"]')
         await clear_all_text.press('Control+A')
         await clear_all_text.press('Delete')
 
-        const editor_box = page.locator('[class="MuiBox-root css-1o1jyss"]')
+        const editor_box = page.locator('[class="tiptap ProseMirror ProseMirror-focused"]')
         await editor_box.click()
         const header_1 = "test_big_header"
-        await editor_box.fill(header_1)
+        await editor_box.fill(header_1, {timeout:5000})
         await editor_box.press('Control+A')
-        await page.locator('text-is("Normal Text")').click()
-        await page.locator('text-is("Big Header")').click()
+        await page.locator(':text-is("Normal Text")').click({timeout:5000})
+        await page.locator(':text-is("Big Header")').click({timeout:5000})
 
-        await page.locator('text-is("Save")').click()
-    })
+        await page.locator(':text-is("Save")').click()
+
+        await expect(content_box).toBeVisible()
+            
+    }) 
 })
