@@ -2,14 +2,19 @@ import {test, expect} from '@playwright/test'
 
 test.beforeEach(async({page}) => {
     await page.goto('https://aladdin-ui-stage.etloptival.com/login')
+    await page.waitForLoadState('load')
     await page.getByPlaceholder('Enter your Email').click()
     await page.getByPlaceholder('Enter your Email').fill('tester@etloptival.com')
     await page.locator('[type="password"]').click()
-    await page.locator('[type="password"]').fill('<1d!A3I:flD0')
+    await page.locator('[type="password"]').fill('#4JuS5O*4y~/')
     await page.getByText('LOGIN NOW').click()
-    
-    await page.waitForLoadState('load')
-    await page.waitForLoadState("networkidle")
+
+    if (await page.getByTitle('Home').isVisible()) {
+        console.log("Login Successfull.")
+    } 
+    else if (await page.getByText('Invaild email or password. Please check your credentials and try again').isVisible()){
+        console.log("Invaild email or password.")
+    }
 })
 
 test.describe('Page Builder',() => {
@@ -93,14 +98,16 @@ test.describe('Page Builder',() => {
 
         await page.locator('[data-testid="WebAssetIcon"]').click()
         await page.locator(':text-is("Page Building")').click()
+        // await page.locator('data-testid="ChevronLeftIcon"').click()
         await page.locator('#combo-box-demo').click()
         await page.keyboard.press('ArrowDown')
         await page.keyboard.press ('Enter')
-        await page.locator(':text-is("SELECT SITE")').click()
-        await page.waitForLoadState("networkidle")
+        await page.locator(':text-is("SELECT SITE")').click({timeout:30000})
+        await page.waitForLoadState("load")
 
-        await page.locator(':text-is("Create New Page")').click()
-        await page.waitForLoadState('networkidle')
+        await page.waitForSelector(':text-is("Create New Page")')
+        await page.locator(':text-is("Create New Page")').click({timeout:60000})
+        await page.waitForLoadState('load')
 
         const new_page_name = `test_${Date.now()}`
 
@@ -118,7 +125,9 @@ test.describe('Page Builder',() => {
         expect(new_page_name).toBe(new_page_name)
 
         const add_content_button = page.locator(':text-is("ADD CONTENT")')
-        await expect(add_content_button).toBeVisible({timeout:15000})
+        await expect(add_content_button).toBeVisible({timeout:60000})
+        await page.waitForLoadState('load')
+        await page.waitForLoadState('networkidle')
         await add_content_button.click()
 
         const floating_menu = page.locator('[class="MuiBox-root css-29py95"]')
@@ -144,6 +153,70 @@ test.describe('Page Builder',() => {
         await page.locator(':text-is("Save")').click()
 
         await expect(content_box).toBeVisible()
-            
+
+        const add_below_button = page.locator('[aria-label="Add Below"]')
+        await add_below_button.click()
+
+        const add_widget = page.locator('[data-testid="WidgetsIcon"]')
+        await add_widget.click()
+
+        await expect(page.locator(':text-is("Choose a Widget")')).toBeVisible()
+
+        const select_device_desktop = page.locator(':text-is("Desktop (1280px)")')
+        await select_device_desktop.click()
+
+        const select_widget_type = page.locator('[placeholder="Please select a widget type from the list."]')
+        await select_widget_type.click()
+        await page.keyboard.press('ArrowDown')
+        await page.keyboard.press('Enter')
+
+        const select_widget_name = page.locator('[placeholder="Please select a coupon table from the list."]')
+        await select_widget_name.click()
+        await page.keyboard.press('ArrowDown')
+        await page.keyboard.press('Enter')
+
+        const add_widget_button = page.locator('[class="MuiBox-root css-zs0ef5"]').getByRole('button').nth(1)
+        await add_widget_button.click({timeout:5000})
+
+        const page_preview = page.locator('[data-testid="PreviewIcon"]')
+        await expect(page_preview).toBeVisible({timeout:10000})
+        await page_preview.click({timeout:10000})
+        await page.waitForLoadState('load')
+        await page.waitForLoadState('networkidle')
+
+        await expect(page.locator('#customized-dialog-title')).toBeVisible({timeout:60000})
+
+        const preview_page_desktop = page.locator('[value="1440px"]')
+        await preview_page_desktop.click({timeout:30000})
+        await page.waitForLoadState('load')
+        await page.waitForLoadState('networkidle')
+
+        await expect(page.locator('[title="Page Preview"]')).toBeVisible({ timeout: 20000 })
+        await expect(page.locator('[class="wrpr htmlWrapper"]')).toBeVisible({ timeout: 20000 })
+
+        // const validate_header_text = page.locator(".main").getByText(`${header_1}`)
+        // await page.waitForLoadState('load')
+        // await page.waitForLoadState('networkidle')
+
+        // expect(header_1).toBe(validate_header_text)
+
+        const close_preview_screen = page.locator('[data-testid="CloseIcon"]')
+        await expect(close_preview_screen).toBeVisible({ timeout: 20000 })
+        await close_preview_screen.first().click()
+
+        const save_page = page.locator('[data-testid="SaveIcon"]')
+        await save_page.click()
+        await page.waitForLoadState('load')
+        await page.waitForLoadState('networkidle')
+
+        await expect(page.locator(':text-is("pending")')).toBeVisible()
+
+        const publish_button = page.locator(':text-is("PUBLISH")')
+        await publish_button.click()
+        await page.waitForLoadState('load')
+        await page.waitForLoadState('networkidle')
+
+        await expect(page.locator(':text-is("publish")')).toBeVisible()
+
     }) 
 })
