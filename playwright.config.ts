@@ -13,8 +13,12 @@ const config = {
 module.exports = config;
 
 export default defineConfig({
-  globalTimeout: 60000,
   
+  timeout: 60000, // test-level timeout
+  expect: {
+    timeout: 10000, // default expect timeout
+  },
+
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -27,7 +31,6 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
-  timeout: 60000,
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
